@@ -32,7 +32,7 @@
 
  <aside class="main-sidebar sidebar-dark-primary elevation-4 custom-sidebar">
     <a href="{{ route('dashboard') }}" class="brand-link d-flex flex-column align-items-center" style="height: auto;">
-      <img id="logo_wrap"   src="{{ asset('img/qms_1.png') }}" style="width: 200px; height: 70px;">
+      <img id="logo_wrap"   src="{{ asset('img/secutiry_new.png') }}" style="width: 100px; height: 100px;">
     </a>
 
     <div class="sidebar">
@@ -116,15 +116,15 @@
   
         if (isSidebarCollapsed) {
           // Sidebar collapsed: ganti logo dan tampilkan title
-          logoWrap.src = "{{ asset('img/qms_1.png') }}";
-          logoWrap.style.width = "200px";
-          logoWrap.style.height = "70px";
+          logoWrap.src = "{{ asset('img/secutiry_new.png') }}";
+          logoWrap.style.width = "100px";
+          logoWrap.style.height = "100px";
           logoTitle.style.display = "block";
         } else {
           // Sidebar expanded: kembalikan ke logo default dan sembunyikan title
-          logoWrap.src = "{{ asset('img/qms_logo.png') }}";
-          logoWrap.style.width = "100px";
-          logoWrap.style.height = "100px";
+          logoWrap.src = "{{ asset('img/secutiry_new.png') }}";
+          logoWrap.style.width = "60px";
+          logoWrap.style.height = "60px";
           logoTitle.style.display = "none"; 
 
          
