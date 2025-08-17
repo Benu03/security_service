@@ -15,14 +15,14 @@ use Illuminate\Support\Facades\Session;
 class MasterController extends Controller
 {
 
-    public function karyawan(Request $request)
+    public function UsersAccess(Request $request)
     {
         
         $role = Session::get('modules')['role'] ?? null;
         if ($role === 'ADMIN' || $role === 'SUPER ADMIN') {
                  $data = [
-                        'title' => 'Master Karyawan',
-                        'content' => 'master/karyawan',
+                        'title' => 'Master Users Access',
+                        'content' => 'master/user_access',
                 ];
                 
                 return view('layout/wrapper', $data);
@@ -38,14 +38,15 @@ class MasterController extends Controller
         
     }
 
-    public function perusahaan(Request $request)
+
+    public function JadwalPresensi(Request $request)
     {
         
         $role = Session::get('modules')['role'] ?? null;
         if ($role === 'ADMIN' || $role === 'SUPER ADMIN') {
                  $data = [
-                        'title' => 'Master Perusahan',
-                        'content' => 'master/perusahaan',
+                        'title' => 'Master Jadwal Presensi',
+                        'content' => 'master/jadwal_presensi',
                 ];
                 
                 return view('layout/wrapper', $data);
@@ -61,14 +62,14 @@ class MasterController extends Controller
         
     }
 
-    public function presensi(Request $request)
+     public function TitikPatroli(Request $request)
     {
         
         $role = Session::get('modules')['role'] ?? null;
         if ($role === 'ADMIN' || $role === 'SUPER ADMIN') {
                  $data = [
-                        'title' => 'Master Presensi',
-                        'content' => 'master/presensi',
+                        'title' => 'Master Titik Patroli',
+                        'content' => 'master/titik_patroli',
                 ];
                 
                 return view('layout/wrapper', $data);

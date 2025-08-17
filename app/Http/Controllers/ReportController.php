@@ -16,14 +16,14 @@ class ReportController extends Controller
 {
 
 
-  public function report(Request $request)
+  public function Laporan(Request $request)
     {
         
         $role = Session::get('modules')['role'] ?? null;
         if ($role === 'ADMIN' || $role === 'SUPER ADMIN') {
                  $data = [
-                        'title' => 'Report Page',
-                        'content' => 'report/report',
+                        'title' => 'Laporan',
+                        'content' => 'laporan/laporan',
                 ];
                 
                 return view('layout/wrapper', $data);

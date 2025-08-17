@@ -34,19 +34,21 @@ Route::group(['middleware' => ['session_key']],function(){
 
 
     Route::get('/master-data', [MasterController::class, 'masterData'])->name('master-data');
-    Route::get('/karyawan', [MasterController::class, 'karyawan'])->name('karyawan');
-    Route::get('/perusahaan', [MasterController::class, 'perusahaan'])->name('perusahaan');
-    Route::get('/presensi', [MasterController::class, 'presensi'])->name('presensi');
+    Route::get('/users-access', [MasterController::class, 'UsersAccess'])->name('users-access');
+    Route::get('/jadwal-presensi', [MasterController::class, 'JadwalPresensi'])->name('jadwal-presensi');
+    Route::get('/titik-patroli', [MasterController::class, 'TitikPatroli'])->name('titik-patroli');
 
 
     
     Route::get('/security', [SecurityController::class, 'Security'])->name('security');
+    Route::get('/presensi', [SecurityController::class, 'Presensi'])->name('presensi');
+    Route::get('/patroli', [SecurityController::class, 'Patroli'])->name('patroli');
+    Route::get('/temuan', [SecurityController::class, 'Temuan'])->name('temuan');
     
+
+
     
-    Route::get('/cleaning', [CleanController::class, 'Cleaning'])->name('cleaning');
-    
-    
-    Route::get('/report', [ReportController::class, 'report'])->name('report');
+    Route::get('/laporan', [ReportController::class, 'Laporan'])->name('laporan');
     
 });
 
