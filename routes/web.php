@@ -35,8 +35,16 @@ Route::group(['middleware' => ['session_key']],function(){
 
     Route::get('/master-data', [MasterController::class, 'masterData'])->name('master-data');
     Route::get('/users-access', [MasterController::class, 'UsersAccess'])->name('users-access');
+    Route::get('/get-users-access', [MasterController::class, 'GetUsersAccess'])->name('get-users-access');
+    Route::post('/edit-users-access', [MasterController::class, 'EditUsersAccess'])->name('edit-users-access');
+
+
     Route::get('/jadwal-presensi', [MasterController::class, 'JadwalPresensi'])->name('jadwal-presensi');
+
+
     Route::get('/titik-patroli', [MasterController::class, 'TitikPatroli'])->name('titik-patroli');
+    Route::get('/get-titik-patroli', [MasterController::class, 'GetTitikPatroli'])->name('get-titik-patroli');
+    Route::post('/add-titik-patroli', [MasterController::class, 'AddTitikPatroli'])->name('add-titik-patroli');
 
 
     

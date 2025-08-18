@@ -67,7 +67,7 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/laravel_qms.log'),
+            'path' => storage_path('logs/security.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 14,
             'replace_placeholders' => true,
