@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
+use Barryvdh\DomPDF\Facade\Pdf;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
 class MasterController extends Controller
@@ -219,32 +221,38 @@ class MasterController extends Controller
                  DB::connection('scr')->beginTransaction();
                 try {
 
-                //          $seq = check  scr.scr_mst_customer_location where customer_name dann category 
-                //          max seq  + 1
+                          $seq = DB::connection('scr')
+                                ->table('scr.scr_mst_customer_location')
+                                ->where('customer_name', trim($request->customer))
+                                ->where('category', trim($request->category))
+                                ->max('seq');
+                        $seq = $seq ? $seq + 1 : 1;
 
-                //          $code = CHK_TIMESTAP
-                        
-                //      $dataInsert = [
-                //                 'customer_name'            => trim($request->customer),
-                //                 'category'       => isset($request->category) ? trim($request->category) : null,
-                //                 'seq'   => $seq,
-                //                 'latitude' => isset($request->latitude) ? trim($request->latitude) : null,
-                //                 'longitude'         => trim($request->longitude),
-                //                 'radius'    => trim($request->radius),
-                //                 'checkpoint_code'    => $code,
-                //                 'location'    => trim($request->customer_list),
-                //                 'created_by'       => $user['username'] ?? 'SYSTEM'
-                //                 ];
+                        $code = $request->category === 'PRESENSI' ? null : 'CHK_' . now()->format('YmdHis');
 
-                                Log::info($request);
-                                        
-                        // DB::connection('scr')->table('scr.scr_mst_customer_location')->insert($dataInsert);
+                        $dataInsert = [
+                                'customer_name'   => trim($request->customer),
+                                'category'        => $request->category ? trim($request->category) : null,
+                                'seq'             => $seq,
+                                'latitude'        => $request->latitude ? trim($request->latitude) : null,
+                                'longitude'       => $request->longitude ? trim($request->longitude) : null,
+                                'radius'          => trim($request->radius),
+                                'checkpoint_code' => $code,
+                                'location'        => trim($request->location),
+                                'created_by'      => $user['username'] ?? 'SYSTEM',
+                        ];
+
+                        DB::connection('scr')->table('scr.scr_mst_customer_location')->insert($dataInsert);
 
                         DB::connection('scr')->commit();
+
                         return response()->json([
-                        'success' => true,
-                        'message' => 'Data berhasil ditambahkan.'
+                                'success' => true,
+                                'message' => 'Data berhasil ditambahkan.'
                         ]);
+
+
+
                 } catch (\Exception $e) {
                         DB::connection('wa')->rollBack();
                         Log::error('Error AddReqDriver', ['message' => $e->getMessage()]);
@@ -257,6 +265,86 @@ class MasterController extends Controller
 
         }
 
+        public function PrintQrTitikPatroli($data,Request $request)
+        {
+                $user = Session::get('user_module');
+                $role = Session::get('modules')['role'] ?? null;
+
+                if (!in_array($role, ['ADMIN'])) {
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Access Forbidden: Anda tidak memiliki izin untuk menambah data ini.'
+                        ], 403);
+                }
+
+                $GetData =  DB::connection('scr')
+                                ->table('scr.scr_mst_customer_location')->find($data);
+
+                if (!$GetData) {
+                return response()->json([
+                        'success' => false,
+                        'message' => 'Data tidak ditemukan.',
+                ], 404);
+                }
+
+
+                $qrCode = base64_encode(QrCode::format('png')->size(200)->generate($GetData->checkpoint_code));
+
+
+                $pdf = Pdf::loadView('pdf.titik_patroli_qr', [
+                        'data' => $GetData,
+                        'qrCode' => $qrCode,
+                ]);
+
+                 return $pdf->stream("QR_TitikPatroli_{$GetData->checkpoint_code}.pdf");
+                Log::info($GetData);
+
+                
+
+        }
+
+        public function GetTitikPatroliDetail($id, Request $request)
+        {
+                $user = Session::get('user_module');
+                $role = Session::get('modules')['role'] ?? null;
+
+                if (!in_array($role, ['ADMIN'])) {
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Access Forbidden: Anda tidak memiliki izin untuk melihat data ini.'
+                        ], 403);
+                }
+
+                $data = DB::connection('scr')
+                                ->table('scr.scr_mst_customer_location')
+                                ->where('id', $id)
+                                ->first();
+
+                if (!$data) {
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Data tidak ditemukan.',
+                        ], 404);
+                }
+
+                return response()->json([
+                        'success' => true,
+                        'customer_name' => $data->customer_name,
+                        'category' => $data->category,
+                        'latitude' => $data->latitude,
+                        'longitude' => $data->longitude,
+                        'radius' => $data->radius,
+                        'checkpoint_code' => $data->checkpoint_code,
+                        'location' => $data->location,
+                        'id_titik' => $data->id,
+                ]);
+        }
+
+
+        
+
+
+        
         
 
 

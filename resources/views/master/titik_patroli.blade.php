@@ -11,25 +11,25 @@
 
             <div class="card-body">
                        {{-- Statistik Count --}}
-                    <div class="row mb-2">
-                        @foreach ($count as $g)
-                            <div class="col-md-2 col-sm-4 col-6 mb-2">
-                                <div class="card shadow-sm border-0 text-white 
-                                            {{ $g->category == 'CHECK POINT' ? 'bg-primary' : 'bg-success' }}"
-                                    style="border-radius: 10px;">
-                                    <div class="card-body d-flex justify-content-between align-items-center p-2">
+                        <div class="row mb-2">
+                            @foreach ($count as $g)
+                                <div class="col-md-3 col-sm-6 col-12 mb-3">
+                                    <div class="d-flex align-items-center p-3 rounded shadow-sm"
+                                        style="background: linear-gradient(135deg, 
+                                                {{ $g->category == 'CHECK POINT' ? '#ff7e5f, #ff7e5f' : '#ff7e5f, #ff7e5f' }};
+                                                color: white; min-height: 80px;">
+                                        <i class="fas {{ $g->category == 'CHECK POINT' ? 'fa-map-marker-alt' : 'fa-user-check' }} fa-2x me-3"></i>
                                         <div>
-                                            <small class="d-block" style="font-size: 11px;">{{ $g->category }}</small>
-                                            <span class="fw-bold" style="font-size: 14px;">{{ $g->total }}</span>
-                                        </div>
-                                        <div>
-                                            <i class="fas {{ $g->category == 'CHECK POINT' ? 'fa-map-marker-alt' : 'fa-user-check' }} fa-sm"></i>
+                                            <div style="font-size: 14px; margin-left: 10px;">{{ $g->category }}</div>
+                                            <div style="font-size: 20px; font-weight: bold; margin-left: 10px;">
+                                                {{ $g->total }}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
+
 
                         {{-- Tombol Add Vendor --}}
                         <div class="d-flex justify-content-end mb-3">
@@ -68,7 +68,7 @@
 
 
 @include('master/modal/titik_patroli_add')
-{{-- @include('master/modal/titik_patroli_edit') --}}
+@include('master/modal/titik_patroli_edit')
 @include('master/modal/position_show')
 
 
@@ -101,12 +101,12 @@
                         render: function(data, type, row) {
                             if (row.latitude && row.longitude) {
                                 return `
-                                    <button class="btn btn-info btn-sm btn-map" 
+                                    <button class="btn btn-success btn-sm btn-map" 
                                             data-lat="${row.latitude}" 
                                             data-lng="${row.longitude}" 
                                             data-location="${row.location}"
                                              data-radius="${row.radius}">
-                                        <i class="fas fa-map-marker-alt"></i> View Map
+                                        <i class="fas fa-map-marker-alt"></i>
                                     </button>
                                 `;
                             }
@@ -136,17 +136,26 @@
                                     return '-';
                             }
                         },
-                        { 
+                        {
                             data: 'id', 
                             orderable: false, 
                             searchable: false,
-                            render: function(data) {
-                                return `
+                            render: function(data, type, row) {
+                                let btn = `
                                     <button class="btn btn-warning btn-sm btn-edit" data-id="${data}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                   
                                 `;
+
+                                if (row.category === 'CHECK POINT') {
+                                    btn += `
+                                        <button class="btn btn-secondary btn-sm btn-print-qr ms-1" data-id="${data}">
+                                            <i class="fas fa-qrcode"></i>
+                                        </button>
+                                    `;
+                                }
+
+                                return btn;
                             }
                         }
                 ]
@@ -160,6 +169,20 @@
             let id = $(this).data('id');
             $('#modalEditTitikPatroli').modal('show');
         });
+
+
+        $(document).on('click', '.btn-print-qr', function() {
+            let id = $(this).data('id');
+
+            window.open(
+                '/titik-patroli-print-qr/' + id,
+                'PrintQR',
+                'width=800,height=600,scrollbars=yes,resizable=yes'
+            );
+        });
+
+
+
 
     });
 </script>

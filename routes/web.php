@@ -45,9 +45,11 @@ Route::group(['middleware' => ['session_key']],function(){
     Route::get('/titik-patroli', [MasterController::class, 'TitikPatroli'])->name('titik-patroli');
     Route::get('/get-titik-patroli', [MasterController::class, 'GetTitikPatroli'])->name('get-titik-patroli');
     Route::post('/add-titik-patroli', [MasterController::class, 'AddTitikPatroli'])->name('add-titik-patroli');
+    Route::get('/titik-patroli-print-qr/{data}', [MasterController::class, 'PrintQrTitikPatroli'])->name('titik-patroli-print-qr');
+    Route::get('/get-titik-patroli-detail/{data}', [MasterController::class, 'GetTitikPatroliDetail'])->name('get-titik-patroli-detail');
 
 
-    
+
     Route::get('/security', [SecurityController::class, 'Security'])->name('security');
     Route::get('/presensi', [SecurityController::class, 'Presensi'])->name('presensi');
     Route::get('/patroli', [SecurityController::class, 'Patroli'])->name('patroli');

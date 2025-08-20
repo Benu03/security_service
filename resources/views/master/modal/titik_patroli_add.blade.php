@@ -3,33 +3,33 @@
   position: relative;
   text-align: center;
   cursor: pointer;
-}
+  }
 
-.custom-radio-card input[type="radio"] {
-  display: none;
-}
+  .custom-radio-card input[type="radio"] {
+    display: none;
+  }
 
-.custom-radio-card label {
-  display: block;
-  padding: 8px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  font-weight: bold;
-  transition: 0.3s;
-  background: #f8f9fa;
-}
+  .custom-radio-card label {
+    display: block;
+    padding: 8px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+    background: #f8f9fa;
+  }
 
-.custom-radio-card label i {
-  font-size: 14px;
-  margin-bottom: 5px;
-}
+  .custom-radio-card label i {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
 
-.custom-radio-card input[type="radio"]:checked + label {
-  border-color: #e26a08;
-  background-color: rgba(226, 106, 8, 0.1);
-  color: #e26a08;
-  box-shadow: 0 0 8px rgba(226, 106, 8, 0.4);
-}
+  .custom-radio-card input[type="radio"]:checked + label {
+    border-color: #e26a08;
+    background-color: rgba(226, 106, 8, 0.1);
+    color: #e26a08;
+    box-shadow: 0 0 8px rgba(226, 106, 8, 0.4);
+  }
 
 </style>
 
@@ -112,7 +112,7 @@
         </div>
 
         <div class="modal-footer">
-          <input type="hidden" id="editId" name="id">
+          {{-- <input type="hidden" id="editId" name="id"> --}}
           <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Batal</button>
           <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Simpan</button>
         </div>
@@ -121,6 +121,61 @@
   </div>
 </div>
 
+
+<script>
+    $('#formAddTitikPatroli').on('submit', function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Menyimpan data...',
+            text: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: "{{ route('add-titik-patroli') }}",
+            type: "POST",
+            data: $(this).serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(res) {
+                Swal.close();
+                if (res.success) {
+                    $('#modalAddTitikPatroli').modal('hide');
+                    $('#formAddTitikPatroli')[0].reset(); 
+                    $('#dataTabletitikPatroli').DataTable().ajax.reload();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: res.message || 'Data berhasil ditambahkan',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: res.message || 'Terjadi kesalahan'
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: xhr.responseJSON?.message || 'Terjadi kesalahan pada server'
+                });
+            }
+        });
+    });
+
+</script>
 
 
 
