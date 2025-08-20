@@ -38,15 +38,15 @@ Route::group(['middleware' => ['session_key']],function(){
     Route::get('/get-users-access', [MasterController::class, 'GetUsersAccess'])->name('get-users-access');
     Route::post('/edit-users-access', [MasterController::class, 'EditUsersAccess'])->name('edit-users-access');
 
-
     Route::get('/jadwal-presensi', [MasterController::class, 'JadwalPresensi'])->name('jadwal-presensi');
-
 
     Route::get('/titik-patroli', [MasterController::class, 'TitikPatroli'])->name('titik-patroli');
     Route::get('/get-titik-patroli', [MasterController::class, 'GetTitikPatroli'])->name('get-titik-patroli');
     Route::post('/add-titik-patroli', [MasterController::class, 'AddTitikPatroli'])->name('add-titik-patroli');
     Route::get('/titik-patroli-print-qr/{data}', [MasterController::class, 'PrintQrTitikPatroli'])->name('titik-patroli-print-qr');
     Route::get('/get-titik-patroli-detail/{data}', [MasterController::class, 'GetTitikPatroliDetail'])->name('get-titik-patroli-detail');
+    Route::post('/edit-titik-patroli', [MasterController::class, 'EditTitikPatroli'])->name('edit-titik-patroli');
+    Route::get('/delete-titik-patroli/{data}', [MasterController::class, 'DelTitikPatroli'])->name('delete-titik-patroli');
 
 
 

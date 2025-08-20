@@ -54,12 +54,6 @@
             <!-- Customer -->
             <div class="form-group col-md-6">
               <label for="customer"><i class="fas fa-building"></i> Customer</label>
-              {{-- <select class="form-control select2" id="editcustomer" name="customer" required >
-                <option value="">-- Pilih Customer --</option>
-                @foreach($customers as $customer)
-                  <option value="{{ $customer->customer_name }}">{{ $customer->customer_name }}</option>
-                @endforeach
-              </select> --}}
                <input type="text" class="form-control" id="editcustomer" name="customer" readonly required>
             </div>
 
@@ -265,4 +259,59 @@
                 'width=800,height=600,scrollbars=yes,resizable=yes'
             );
         });
+</script>
+
+<script>
+    $('#formEditTitikPatroli').on('submit', function(e) {
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Menyimpan data...',
+            text: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: "{{ route('edit-titik-patroli') }}",
+            type: "POST",
+            data: $(this).serialize(),
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(res) {
+                Swal.close();
+                if (res.success) {
+                    $('#modalEditTitikPatroli').modal('hide');
+                    $('#formEditTitikPatroli')[0].reset(); 
+                    $('#dataTabletitikPatroli').DataTable().ajax.reload();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: res.message || 'Data berhasil diperbaharui',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: res.message || 'Terjadi kesalahan'
+                    });
+                }
+            },
+            error: function(xhr) {
+                Swal.close();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: xhr.responseJSON?.message || 'Terjadi kesalahan pada server'
+                });
+            }
+        });
+    });
+
 </script>

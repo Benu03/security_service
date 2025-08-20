@@ -75,14 +75,13 @@ class MasterController extends Controller
 
                 abort(404);
         }
-
-        
+  
         public function EditUsersAccess(Request $request)
         {
                 $user = Session::get('user_module');
                 $role = Session::get('modules')['role'] ?? null;
 
-                if (!in_array($role, ['ADMIN', 'TMS'])) {
+                if (!in_array($role, ['ADMIN'])) {
                         return response()->json([
                         'success' => false,
                         'message' => 'Access Forbidden: Anda tidak memiliki izin untuk menambah data ini.'
@@ -156,6 +155,7 @@ class MasterController extends Controller
                                 ->table('scr.scr_mst_customer_location')
                                 ->select('category', DB::raw('COUNT(*) as total'))
                                 ->whereIn('category', ['CHECK POINT', 'PRESENSI'])
+                                ->whereNull('deleted_date')
                                 ->groupBy('category')
                                 ->get();
 
@@ -184,13 +184,13 @@ class MasterController extends Controller
                 
         }
 
-        
         public function GetTitikPatroli(Request $request)
         {
 
                 if ($request->ajax()) {
                         $doc = DB::connection('scr')
                         ->table('scr.scr_mst_customer_location')
+                        ->whereNull('deleted_date')
                         ->orderBy('created_date', 'desc');
     
                         return DataTables::of($doc)->make(true);
@@ -203,7 +203,6 @@ class MasterController extends Controller
 
                 abort(404);
         }
-
 
         public function AddTitikPatroli(Request $request)
         {
@@ -340,6 +339,107 @@ class MasterController extends Controller
                 ]);
         }
 
+        public function EditTitikPatroli(Request $request)
+        {
+                $user = Session::get('user_module');
+                $role = Session::get('modules')['role'] ?? null;
+
+                if (!in_array($role, ['ADMIN'])) {
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Access Forbidden: Anda tidak memiliki izin untuk menambah data ini.'
+                        ], 403);
+                }
+
+                 DB::connection('scr')->beginTransaction();
+                try {
+                        
+                     $dataUpdate = [
+                                'latitude'        => $request->latitude ? trim($request->latitude) : null,
+                                'longitude'       => $request->longitude ? trim($request->longitude) : null,
+                                'radius'          => trim($request->radius),
+                                'location'        => trim($request->location),
+                                'updated_by'       => $user['username'] ?? 'SYSTEM',
+                                'updated_date'       => Carbon::now()->format('Y-m-d H:i:s')
+                                ];
+
+                        Log::info($dataUpdate);
+                   
+                                        
+                        DB::connection('scr')->table('scr.scr_mst_customer_location')
+                        ->where('id', $request->id)
+                        ->update($dataUpdate);
+
+                        DB::connection('scr')->commit();
+                        return response()->json([
+                        'success' => true,
+                        'message' => 'Data berhasil di perbaharui.'
+                        ]);
+                } catch (\Exception $e) {
+                        DB::connection('scr')->rollBack();
+                        Log::error('Error AddReqDriver', ['message' => $e->getMessage()]);
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                        ], 500);
+                }
+               
+                
+        }
+
+        public function DelTitikPatroli($id, Request $request)
+        {
+                $user = Session::get('user_module');
+                $role = Session::get('modules')['role'] ?? null;
+
+                if (!in_array($role, ['ADMIN'])) {
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Access Forbidden: Anda tidak memiliki izin untuk menghapus data ini.'
+                        ], 403);
+                }
+
+                $GetData = DB::connection('scr')
+                        ->table('scr.scr_mst_customer_location')
+                        ->find($id);
+
+                if (!$GetData) {
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Data tidak ditemukan.',
+                        ], 404);
+                }
+
+                try {
+                        DB::connection('scr')->beginTransaction();
+
+                        $dataUpdate = [
+                        'deleted_by'   => $user['username'] ?? 'SYSTEM',
+                        'deleted_date' => Carbon::now()->format('Y-m-d H:i:s')
+                        ];
+
+                        Log::info($dataUpdate);
+
+                        DB::connection('scr')
+                        ->table('scr.scr_mst_customer_location')
+                        ->where('id', $id) // <-- gunakan $id, bukan $request->id
+                        ->update($dataUpdate);
+
+                        DB::connection('scr')->commit();
+
+                        return response()->json([
+                        'success' => true,
+                        'message' => 'Data telah berhasil dihapus.',
+                        ]);
+
+                } catch (\Exception $e) {
+                        DB::connection('scr')->rollBack();
+                        return response()->json([
+                        'success' => false,
+                        'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                        ], 500);
+                }
+        }
 
         
 

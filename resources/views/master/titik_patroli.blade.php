@@ -145,6 +145,9 @@
                                     <button class="btn btn-warning btn-sm btn-edit" data-id="${data}">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button class="btn btn-danger btn-sm btn-delete" data-id="${data}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 `;
 
                                 if (row.category === 'CHECK POINT') {
@@ -185,4 +188,69 @@
 
 
     });
+</script>
+
+
+<script>
+    $('#dataTabletitikPatroli').on('click', '.btn-delete', function() {
+    let id = $(this).data('id');
+
+    Swal.fire({
+        title: 'Yakin hapus data ini?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `delete-titik-patroli/${id}`,
+                type: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    Swal.fire({
+                        title: 'Menghapus data...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                },
+                success: function(res) {
+                    Swal.close();
+                    if (res.success) {
+                        $('#dataTabletitikPatroli').DataTable().ajax.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: res.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: xhr.responseJSON?.message || 'Terjadi kesalahan pada server'
+                    });
+                }
+            });
+        }
+    });
+    });
+
 </script>
